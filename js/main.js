@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ─── SCROLL PROGRESS BAR ─── */
   const scrollBar = document.getElementById('scroll-bar');
   const backTop   = document.getElementById('back-top');
+  const scrollIndicator = document.querySelector('.scroll-indicator');
 
   window.addEventListener('scroll', () => {
     const max = document.body.scrollHeight - window.innerHeight;
@@ -29,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Back-to-top visibility
     if (backTop) {
       backTop.classList.toggle('visible', window.scrollY > 400);
+    }
+
+    // Hide scroll indicator once user starts scrolling
+    if (scrollIndicator) {
+      scrollIndicator.classList.toggle('hidden', window.scrollY > 60);
     }
   }, { passive: true });
 
@@ -123,15 +129,93 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-/* ─── CONTACT FORM FEEDBACK ─── */
-function handleFormSubmit(btn) {
+/* ─── CONTACT FORM — sends to mohits.ug24.ec@nitp.ac.in via Web3Forms ─── */
+/*
+  SETUP (one-time, free):
+  1. Go to https://web3forms.com
+  2. Enter your email: mohits.ug24.ec@nitp.ac.in → click "Create Access Key"
+  3. Check your email, copy the access key
+  4. Replace "YOUR_WEB3FORMS_ACCESS_KEY" below with your actual key
+  That's it — no backend, no server needed!
+*/
+const WEB3FORMS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
+
+async function handleFormSubmit(btn) {
+  const form     = btn.closest('.contact-form');
+  const nameEl   = form.querySelector('input[type="text"]');
+  const emailEl  = form.querySelector('input[type="email"]');
+  const msgEl    = form.querySelector('textarea');
+
+  const name    = nameEl.value.trim();
+  const email   = emailEl.value.trim();
+  const message = msgEl.value.trim();
+
+  // Basic validation
+  if (!name || !email || !message) {
+    showFormStatus(btn, '⚠ Please fill all fields', '#ffcc00', '#050e0a');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showFormStatus(btn, '⚠ Enter a valid email', '#ffcc00', '#050e0a');
+    return;
+  }
+
+  // Loading state
   const originalHTML = btn.innerHTML;
-  btn.textContent = 'Message Sent ✓';
-  btn.style.background = '#a8ff3e';
-  btn.style.color = '#050e0a';
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="31.4" style="animation:spin 1s linear infinite"/></svg> Sending…';
+  btn.disabled = true;
+  btn.style.opacity = '.7';
+
+  try {
+    const payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: `Portfolio Contact from ${name}`,
+      from_name: name,
+      replyto: email,
+      message: message
+    };
+
+    const res  = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      showFormStatus(btn, '✓ Message Sent!', 'var(--neon)', '#050e0a');
+      nameEl.value = '';
+      emailEl.value = '';
+      msgEl.value = '';
+    } else {
+      throw new Error(data.message || 'Send failed');
+    }
+  } catch (err) {
+    console.error('Form error:', err);
+    if (WEB3FORMS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY") {
+      showFormStatus(btn, '⚙ Add your Web3Forms key', '#c084fc', '#fff');
+    } else {
+      showFormStatus(btn, '✗ Failed — try email directly', '#ff6b6b', '#fff');
+    }
+  }
+
   setTimeout(() => {
     btn.innerHTML = originalHTML;
     btn.style.background = '';
     btn.style.color = '';
-  }, 3000);
+    btn.style.opacity = '';
+    btn.disabled = false;
+  }, 3500);
 }
+
+function showFormStatus(btn, text, bg, color) {
+  btn.textContent = text;
+  btn.style.background = bg;
+  btn.style.color = color;
+  btn.style.opacity = '1';
+}
+
+/* spin keyframe for loading icon */
+const styleTag = document.createElement('style');
+styleTag.textContent = '@keyframes spin { to { stroke-dashoffset: 0; } }';
+document.head.appendChild(styleTag);

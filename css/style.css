@@ -122,7 +122,7 @@ body::after {
 .sidebar::-webkit-scrollbar { width: 0; }
 
 .sb-brand {
-  padding: 0 1.5rem 1.75rem;
+  padding: 0 1.5rem 1.1rem;
   border-bottom: 1px solid var(--border);
 }
 .sb-logo {
@@ -154,16 +154,16 @@ body::after {
   margin-top: .3rem;
 }
 
-.sb-section { padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.sb-section { padding: 1rem 0; border-bottom: 1px solid var(--border); }
 .sb-label {
   font-family: var(--mono); font-size: .58rem;
   color: var(--chalk3); letter-spacing: .14em;
-  padding: 0 1.5rem .75rem;
+  padding: 0 1.5rem .55rem;
 }
 .sb-link {
   display: flex; align-items: center; gap: .75rem;
-  padding: .6rem 1.5rem;
-  color: var(--chalk3); text-decoration: none;
+  padding: .48rem 1.5rem;
+  color: var(--chalk2); text-decoration: none;
   font-family: var(--body); font-size: .95rem; font-weight: 500;
   transition: color .2s, background .2s, padding-left .25s;
   border: none; background: none; width: 100%; text-align: left; cursor: pointer;
@@ -173,18 +173,18 @@ body::after {
   background: rgba(200,230,210,.04);
   padding-left: 2rem;
 }
-.sb-link svg { width: 15px; height: 15px; opacity: .45; flex-shrink: 0; transition: opacity .2s; }
-.sb-link:hover svg, .sb-link.active svg { opacity: .9; }
+.sb-link svg { width: 15px; height: 15px; opacity: .65; flex-shrink: 0; transition: opacity .2s; }
+.sb-link:hover svg, .sb-link.active svg { opacity: 1; }
 
 .sb-socials {
-  padding: 1.5rem; display: flex; gap: .5rem;
+  padding: 1rem 1.5rem; display: flex; gap: .5rem;
   margin-top: auto;
 }
 .sb-social {
   width: 36px; height: 36px;
   border: 1px solid var(--border); border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  color: var(--chalk3); text-decoration: none;
+  color: var(--chalk2); text-decoration: none;
   transition: border-color .2s, color .2s, transform .2s, box-shadow .2s;
 }
 .sb-social:hover {
@@ -201,8 +201,9 @@ body::after {
   box-shadow: 0 0 8px var(--neon);
 }
 .sb-time {
-  padding: 0 1.5rem 1rem;
-  font-family: var(--mono); font-size: .75rem; color: var(--chalk3);
+  padding: 0 1.5rem .75rem;
+  font-family: var(--mono); font-size: .75rem; color: var(--chalk2);
+  letter-spacing: .04em;
 }
 
 /* ─── MAIN ─── */
@@ -387,6 +388,11 @@ section {
   animation: fadeUp .5s 1.8s forwards;
   z-index: 5;
   pointer-events: none;
+  transition: opacity .5s ease;
+}
+.scroll-indicator.hidden {
+  opacity: 0 !important;
+  animation: none;
 }
 .scroll-line {
   width: 1px; height: 44px;
